@@ -4,7 +4,7 @@
         <form method="post">
             <ul>
             <label>
-                <div><h3><Five most recent blog entry<h3></div>
+                <div><h3>Five most recent blog entries<h3></div>
             </ul>
         </form>
 
@@ -12,7 +12,7 @@
 
             {% for blog_entry in blog_entries %}
                 <div class="post">
-                        <div class="blog_entry-title">{{blog_entry.title}}</div>
+                        <div class="blog_entry-title"><a href="/blog/{{blog_entry.key().id()}}">{{ blog_entry.title}}</a></div>
                         <pre class="blog_entry-body">{{blog_entry.blog_entry}}</pre>
                 </div>
             {% endfor %}

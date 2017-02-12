@@ -56,7 +56,7 @@ class NewPost(Handler):
         if title and blog_entry:
             b = Blog(title = title, blog_entry = blog_entry)
             b.put()
-            self.redirect("/")
+            self.redirect('/blog/%s' % str(b.key().id()))
 
         else:
             error = "We need both a title and some content!"
@@ -70,8 +70,6 @@ class ViewPostHandler(Handler):
         if not blog_entry:
             error = "Incorrect blog id!"
         return self.render("singlepost.html", blog_entry=blog_entry, error=error)
-
-
 
 app = webapp2.WSGIApplication([
     ('/', MainPage),
