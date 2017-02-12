@@ -27,12 +27,23 @@ class Entry(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
 
 class MainPage(Handler):
+
+    #def render_main(self, entries=""):
+    def get(self, entries=""):
+        blog_entries = db.GqlQuery("SELECT * FROM Entry "
+                        "ORDER BY created DESC "
+                        "LIMIT 5")
+        #t = jinja_env.get_template("mainpage.html")
+        #content = t.render(
+                        #entries = blog_entries
+                        #)
+        #self.response.write(content)
+
+        self.render("mainpage.html", entries=blog_entries)
+
+class NewPost(Handler):
     def render_new(self, title="", entry="", error=""):
-        entries = db.GqlQuery("SELECT * FROM Entry "
-                            "ORDER BY created DESC "
-                            "LIMIT 5")
-                            
-        self.render("new_post.html", title=title, entry=entry, error=error, entries=entries)
+        self.render("newpost.html", title=title,entry=entry, error=error)
 
     def get(self):
         self.render_new()
@@ -42,9 +53,8 @@ class MainPage(Handler):
         entry = self.request.get("entry")
 
         if title and entry:
-            p = Entry(title = title, entry = entry)
-            p.put()
-
+            e = Entry(title = title, entry = entry)
+            e.put()
             self.redirect("/")
 
         else:
@@ -53,5 +63,7 @@ class MainPage(Handler):
 
 
 app = webapp2.WSGIApplication([
-    ('/', MainPage)
+    ('/', MainPage),
+    ('/blog', MainPage),
+    ('/newpost', NewPost)
 ], debug=True)

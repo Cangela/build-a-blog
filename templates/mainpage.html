@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content%}
+        <h2>Blog!</h2>
+        <form method="post">
+            <ul>
+            <label>
+                <div><h3><title<h3></div>
+            </ul>
+        </form>
+
+        <hr>
+
+        {% for entry in entries %}
+            <div class="entry">
+                    <div class="entry-title">{{entry.title}}</div>
+                    <pre class="entry-body">{{entry.entry}}</pre>
+            </div>
+        {% endfor %}
+
+
+{% endblock %}
