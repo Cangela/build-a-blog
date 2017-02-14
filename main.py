@@ -1,5 +1,5 @@
-import webapp2
 import os
+import webapp2
 import jinja2
 import re
 
@@ -59,7 +59,7 @@ class NewPost(Handler):
             self.redirect('/blog/%s' % str(b.key().id()))
 
         else:
-            error = "We need both a title and some content!"
+            error = "We need both a title and a body!"
             self.render_newpost(title, blog_entry, error)
 
 class ViewPostHandler(Handler):
@@ -71,9 +71,19 @@ class ViewPostHandler(Handler):
             error = "Incorrect blog id!"
         return self.render("singlepost.html", blog_entry=blog_entry, error=error)
 
+def get_posts(limit, offset):
+    # TODO: query the database for posts, and return them
+    posts = db.GqlQuery("SELECT * FROM Blog "
+                    "ORDER BY created DESC "
+                    "LIMIT limit"
+                    "OFFSET offset")
+    self.render("mainpage.html", blog_entries=posts)
+
+
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/blog', MainPage),
     ('/newpost', NewPost),
-    webapp2.Route('/blog/<id:\d+>', ViewPostHandler)
+    webapp2.Route('/blog/<id:\d+>', ViewPostHandler),
+    #('/blog?Page=\d+, ')
 ], debug=True)

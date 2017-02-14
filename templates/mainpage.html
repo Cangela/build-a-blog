@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content%}
-        
+
         <form method="post">
             <ul>
             <label>
@@ -12,9 +12,19 @@
 
             {% for blog_entry in blog_entries %}
                 <div class="post">
-                        <div class="blog_entry-title"><a href="/blog/{{blog_entry.key().id()}}">{{ blog_entry.title}}</a></div>
+                        <div class="blog_entry-title"><h2><a href="/blog/{{blog_entry.key().id()}}">{{ blog_entry.title}}</a></h2></div>
                         <pre class="blog_entry-body">{{blog_entry.blog_entry}}</pre>
                 </div>
+                <br>
             {% endfor %}
+
+            <p>
+                {% if prev %}
+                    <a href="/offset_pagination?offset={{ prev_offset }}">Previous</a>
+                {% endif %}
+                {% if next %}
+                    <a href="/offset_pagination?offset={{ next_offset }}">Next</a>
+                {% endif %}
+            </p>
 
 {% endblock %}
