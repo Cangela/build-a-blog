@@ -1,3 +1,4 @@
+
 import os
 import webapp2
 import jinja2
@@ -10,7 +11,7 @@ template_dir = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                 autoescape = True)
 
-class  Handler(webapp2.RequestHandler):
+class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
 
@@ -21,26 +22,37 @@ class  Handler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
-
 class Blog(db.Model):
     title = db.StringProperty(required = True)
     blog_entry = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
 
 class MainPage(Handler):
+    def get(self, blog_entries="", page=1, limit=5, g="" ,count=0, offset=0, prev_button=True, next_button=True):
 
-    #def render_main(self, entries=""):
-    def get(self, blog_entries=""):
-        blog_entries = db.GqlQuery("SELECT * FROM Blog "
-                        "ORDER BY created DESC "
-                        "LIMIT 5")
-        #t = jinja_env.get_template("mainpage.html")
-        #content = t.render(
-                        #entries = blog_entries
-                        #)
-        #self.response.write(content)
+        #remember you have to assign the variable or get request won't store the value
+        page = self.request.get('page')
 
-        self.render("mainpage.html", blog_entries=blog_entries)
+        if page and page.isdigit():
+            page = int(page)
+            offset = (page - 1) * 5
+        else:
+            page = 1
+
+        if page == 1:
+            offset = 0
+            prev_button = False
+
+        blog_entries = get_posts(limit, offset)
+
+        #use count to make sure there are no blog entries on the page after the last page
+        #offset=offset will leave a next button on the last page
+
+        count = blog_entries.count(offset=offset + 5, limit=limit)
+        if count == 0:
+            next_button = False
+
+        self.render("mainpage.html", g=g, count=count, blog_entries=blog_entries, page=page, prev_button=prev_button, next_button=next_button)
 
 class NewPost(Handler):
     def render_newpost(self, title="", blog_entry="", error=""):
@@ -56,34 +68,31 @@ class NewPost(Handler):
         if title and blog_entry:
             b = Blog(title = title, blog_entry = blog_entry)
             b.put()
+            #have to turn b.key().id() into a string to use it with '/blog'
             self.redirect('/blog/%s' % str(b.key().id()))
-
         else:
             error = "We need both a title and a body!"
             self.render_newpost(title, blog_entry, error)
 
+def get_posts(limit, offset):
+    # TODO: query the database for posts, and return them
+
+    posts = db.GqlQuery("SELECT * FROM Blog "
+                    "ORDER BY created DESC "
+                    "LIMIT %s OFFSET %s" % (limit, offset))
+    return posts
+
 class ViewPostHandler(Handler):
     def get(self, id):
-
         blog_entry = Blog.get_by_id(int(id), parent=None)
         error =""
         if not blog_entry:
             error = "Incorrect blog id!"
         return self.render("singlepost.html", blog_entry=blog_entry, error=error)
 
-def get_posts(limit, offset):
-    # TODO: query the database for posts, and return them
-    posts = db.GqlQuery("SELECT * FROM Blog "
-                    "ORDER BY created DESC "
-                    "LIMIT limit"
-                    "OFFSET offset")
-    self.render("mainpage.html", blog_entries=posts)
-
-
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/blog', MainPage),
     ('/newpost', NewPost),
     webapp2.Route('/blog/<id:\d+>', ViewPostHandler),
-    #('/blog?Page=\d+, ')
-], debug=True)
+    ], debug=True)
