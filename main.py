@@ -1,4 +1,3 @@
-
 import os
 import webapp2
 import jinja2
@@ -28,20 +27,20 @@ class Blog(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
 
 class MainPage(Handler):
-    def get(self, blog_entries="", page=1, limit=5, g="" ,count=0, offset=0, prev_button=True, next_button=True):
+    def get(self, blog_entries="", page=1, limit=5, count=0, offset=0, prev_page=None, next_page=None):
 
         #remember you have to assign the variable or get request won't store the value
         page = self.request.get('page')
 
         if page and page.isdigit():
             page = int(page)
-            offset = (page - 1) * 5
         else:
             page = 1
+            prev_page = None
 
-        if page == 1:
-            offset = 0
-            prev_button = False
+        if page > 1:
+            offset = (page - 1) * limit
+            prev_page = page - 1
 
         blog_entries = get_posts(limit, offset)
 
@@ -50,9 +49,15 @@ class MainPage(Handler):
 
         count = blog_entries.count(offset=offset + 5, limit=limit)
         if count == 0:
-            next_button = False
+            next_page = None
+        else:
+            next_page = page + 1
 
-        self.render("mainpage.html", g=g, count=count, blog_entries=blog_entries, page=page, prev_button=prev_button, next_button=next_button)
+        self.render("mainpage.html",
+                    blog_entries=blog_entries,
+                    page=page,
+                    prev_page=prev_page,
+                    next_page=next_page)
 
 class NewPost(Handler):
     def render_newpost(self, title="", blog_entry="", error=""):
