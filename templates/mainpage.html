@@ -13,7 +13,7 @@
             page {{page}}
             <!--blog_entries {{count}} !-->
 
-
+        <p>
             {% for blog_entry in blog_entries %}
                 <div class="post">
                         <div class="blog_entry-title"><h2><a href="/blog/{{ blog_entry.key().id() }}">{{ blog_entry.title}}</a></h2></div>
@@ -22,7 +22,7 @@
                 <br>
             {% endfor %}
 
-        <p>
+
             {% if prev_page %}
                 <a href="/blog?page={{ prev_page }}">&lt; Previous</a>
                 &nbsp;&nbsp;
@@ -33,7 +33,7 @@
             {% endif %}
 
             {% if next_page %}
-                | &nbsp;&nbsp;
+                &nbsp;&nbsp;
                 <a href="/blog?page={{ next_page }}">Next &gt;</a>
 
             {% endif %}
