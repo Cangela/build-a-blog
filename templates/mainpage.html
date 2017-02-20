@@ -22,22 +22,19 @@
                 <br>
             {% endfor %}
 
-
             {% if prev_page %}
                 <a href="/blog?page={{ prev_page }}">&lt; Previous</a>
                 &nbsp;&nbsp;
             {% endif %}
-            {% if prev_page and next_page %}
 
-            &nbsp;&nbsp; | &nbsp;&nbsp;
+            {% if prev_page and next_page %}
+                &nbsp;&nbsp; | &nbsp;&nbsp;
             {% endif %}
 
             {% if next_page %}
                 &nbsp;&nbsp;
                 <a href="/blog?page={{ next_page }}">Next &gt;</a>
-
             {% endif %}
         </p>
-
 
 {% endblock %}
